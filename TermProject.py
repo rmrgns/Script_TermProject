@@ -1,7 +1,13 @@
 from tkinter import *
 from tkinter import font
+import requests
 
-ServiceKey = ''
+ServiceKey = 'dZcoKqxJ0w46SNHY9aMe4zgyOynLtTE0cL4fm9OOQ7oboRaunGQ09BLwKlqx1nwpH8hDfNRVFDrOOsH2Tv5jEg=='
+url1 = 'https://apis.data.go.kr/1400000/service/cultureInfoService2/mntInfoOpenAPI2'
+url2 = 'https://apis.data.go.kr/1400377/forestPoint/forestPointListEmdSearch'
+# url3 = 'https://apis.data.go.kr/1400000/forestStusService/getfirestatsservice'
+
+queryParams = {'serviceKey': ServiceKey, 'pageNo': '1', 'numOfRows': '10'}
 
 
 class MainGUI:
