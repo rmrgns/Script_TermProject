@@ -9,33 +9,58 @@ url1 = 'https://apis.data.go.kr/1400000/service/cultureInfoService2/mntInfoOpenA
 url2 = 'https://apis.data.go.kr/1400377/forestPoint/forestPointListEmdSearch'
 # url3 = 'https://apis.data.go.kr/1400000/forestStusService/getfirestatsservice'
 
-queryParams = {'serviceKey': ServiceKey, 'pageNo': '1', 'numOfRows': '10'}
-response = requests.get(url1, params=queryParams)
-root = ET.fromstring(response.text)
 
-header1 = ['mntiname', 'mntiadd', 'mntihigh', 'mntiadmin', 'mntiadminnum']
+
+
+header1 = ['이름', '주소', '높이', '소재지', '소재지 전화번호']
 
 class MainGUI:
+
     def SearchName(self):
+        self.EmptySearchName()
+        self.name = self.SearchInput.get()
+        queryParams = {'serviceKey': ServiceKey, 'searchWrd': self.name}
+        response = requests.get(url1, params=queryParams)
+        self.root = ET.fromstring(response.text)
         for i, col_name in enumerate(header1):
             label = tkinter.Label(self.frame2, text=col_name, font=("Helvetica", 14, "bold"))
             label.grid(row=0, column=i)
 
         self.row_count = 1
-        for item in root.iter("item"):
+        for item in self.root.iter("item"):
             self.mntiname = item.findtext("mntiname")
             self.mntiadd = item.findtext("mntiadd")
             self.mntihigh = item.findtext("mntihigh")
             self.mntiadmin = item.findtext("mntiadmin")
             self.mntiadminnum = item.findtext("mntiadminnum")
-
+            #self.mntidetails = item.findtext("mntidetails")
+            self.mntilistno = item.findtext("mntilistno")
             self.data = [self.mntiname, self.mntiadd, self.mntihigh, self.mntiadmin, self.mntiadminnum]
+            #self.data = [self.mntiname, self.mntiadd, self.mntihigh, self.mntiadmin, self.mntiadminnum, self.mntidetails]
             for i, value in enumerate(self.data):
                 label = tkinter.Label(self.frame2, text=value, font=("Helvetica", 12))
                 label.grid(row=self.row_count, column=i)
-
+            button = tkinter.Button(self.frame2, text='숲길 정보', font=("Helvetica", 12), command=self.SearchMountainLoad(self.mntilistno))
+            button.grid(row=self.row_count, column=5)
             self.row_count += 1
-        pass
+    def EmptySearchName(self):
+        myList = self.frame2.grid_slaves()
+        for i in myList:
+            i.destroy()
+
+    def SearchMountainLoad(self, listno):
+        queryParams2 = {'serviceKey': ServiceKey, 'mntiListNo': listno}
+        response2 = requests.get(url1, params=queryParams2)
+        self.root2 = ET.fromstring(response2.text)
+        label = tkinter.Label(self.frame3, text='숲길 이름', font=("Helvetica", 14, "bold"))
+        label.grid(row=0, column=0)
+        row_count = 1
+        for item in self.root2.iter("item"):
+            self.frtrlsectnnm = item.findtext("frtrlsectnnm")
+            label = tkinter.Label(self.frame3, text=self.frtrlsectnnm, font=("Helvetica", 12))
+            label.grid(row=row_count, column=0)
+            row_count += 1
+
 
     def SearchLocation(self):
         pass
@@ -44,26 +69,30 @@ class MainGUI:
         pass
 
     def __init__(self):
+        self.name = ""
+        self.SearchLabel = []
         # window 생성 및 타이틀 설정
-        window = Tk()
-        window.title('등산 알리미')
-        self.frame2 = tkinter.Frame(window)
-        self.frame2.pack(side='right')
+        self.window = Tk()
+        self.window.title('등산 알리미')
+        self.frame2 = tkinter.Frame(self.window)
+        self.frame2.grid(row=0, column=1)
+        self.frame3 = tkinter.Frame(self.window)
+        self.frame3.grid(row=0, column=2)
         #notebook = tkinter.ttk.Notebook(window, width=800, height=600)
         #notebook.pack()
         # Main Screen
         # 제목
-        self.AppNameFont = font.Font(window, size=32, weight='bold')
-        self.AppNameLb = Label(window, text='등산 알리미', font=self.AppNameFont)
-        self.AppNameLb.pack()
+        self.AppNameFont = font.Font(self.window, size=32, weight='bold')
+        self.AppNameLb = Label(self.window, text='등산 알리미', font=self.AppNameFont)
+        self.AppNameLb.grid(row=0, column=0)
 
         # 이미지
         self.MainImage = PhotoImage(file='tempImage.png')
-        self.MainImageLb = Label(window, image=self.MainImage)
-        self.MainImageLb.pack()
+        self.MainImageLb = Label(self.window, image=self.MainImage)
+        self.MainImageLb.grid(row=1, column=0)
 
-        self.frame = Frame(window)
-        self.frame.pack()
+        self.frame = Frame(self.window)
+        self.frame.grid(row=2, column=0)
         #frameMtnName = Frame(window)
         #frameMtnName.pack(side='right')
         #notebook.add(frameMtnName, text='산 이름 검색')
@@ -71,12 +100,16 @@ class MainGUI:
         #Label(frameMtnName, text="페이지1의 내용", fg='red', font='helvetica 48').pack()
         self.SearchLocationBtn = Button(self.frame, text='지역 이름 검색', command=self.SearchLocation)
         self.LikeListBtn = Button(self.frame, text='즐겨찾기', command=self.LikeList)
+        self.SearchInput = Entry(self.frame)
+        self.LocationInput = Entry(self.frame)
 
-        self.SearchNameBtn.pack()
-        self.SearchLocationBtn.pack()
-        self.LikeListBtn.pack()
+        self.SearchNameBtn.grid(row=0, column=0)
+        self.SearchInput.grid(row=0, column=1)
+        self.SearchLocationBtn.grid(row=1, column=0)
+        self.LocationInput.grid(row=1,column=1)
+        self.LikeListBtn.grid(row=2, column=0)
 
-        window.mainloop()
+        self.window.mainloop()
 
 
 MainGUI()
