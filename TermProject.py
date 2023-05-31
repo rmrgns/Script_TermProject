@@ -15,11 +15,11 @@ url2 = 'https://apis.data.go.kr/1400377/forestPoint/forestPointListEmdSearch'
 header1 = ['이름', '주소', '높이', '소재지', '소재지 전화번호']
 
 class MainGUI:
-
     def SearchName(self):
         self.EmptySearchName()
         self.name = self.SearchInput.get()
-        queryParams = {'serviceKey': ServiceKey, 'searchWrd': self.name}
+        #queryParams = {'serviceKey': ServiceKey, 'searchWrd': self.name, 'numOfRows': 3368}
+        queryParams = {'serviceKey': ServiceKey, 'numOfRows': 3368}
         response = requests.get(url1, params=queryParams)
         self.root = ET.fromstring(response.text)
         for i, col_name in enumerate(header1):
@@ -28,21 +28,22 @@ class MainGUI:
 
         self.row_count = 1
         for item in self.root.iter("item"):
-            self.mntiname = item.findtext("mntiname")
-            self.mntiadd = item.findtext("mntiadd")
-            self.mntihigh = item.findtext("mntihigh")
-            self.mntiadmin = item.findtext("mntiadmin")
-            self.mntiadminnum = item.findtext("mntiadminnum")
-            #self.mntidetails = item.findtext("mntidetails")
-            self.mntilistno = item.findtext("mntilistno")
-            self.data = [self.mntiname, self.mntiadd, self.mntihigh, self.mntiadmin, self.mntiadminnum]
-            #self.data = [self.mntiname, self.mntiadd, self.mntihigh, self.mntiadmin, self.mntiadminnum, self.mntidetails]
-            for i, value in enumerate(self.data):
-                label = tkinter.Label(self.frame2, text=value, font=("Helvetica", 12))
-                label.grid(row=self.row_count, column=i)
-            button = tkinter.Button(self.frame2, text='숲길 정보', font=("Helvetica", 12), command=self.SearchMountainLoad(self.mntilistno))
-            button.grid(row=self.row_count, column=5)
-            self.row_count += 1
+            if item.findtext("mntiname") == self.name:
+                self.mntiname = item.findtext("mntiname")
+                self.mntiadd = item.findtext("mntiadd")
+                self.mntihigh = item.findtext("mntihigh")
+                self.mntiadmin = item.findtext("mntiadmin")
+                self.mntiadminnum = item.findtext("mntiadminnum")
+                #self.mntidetails = item.findtext("mntidetails")
+                self.mntilistno = item.findtext("mntilistno")
+                self.data = [self.mntiname, self.mntiadd, self.mntihigh, self.mntiadmin, self.mntiadminnum]
+                #self.data = [self.mntiname, self.mntiadd, self.mntihigh, self.mntiadmin, self.mntiadminnum, self.mntidetails]
+                for i, value in enumerate(self.data):
+                    label = tkinter.Label(self.frame2, text=value, font=("Helvetica", 12))
+                    label.grid(row=self.row_count, column=i)
+                button = tkinter.Button(self.frame2, text='숲길 정보', font=("Helvetica", 12), command=self.SearchMountainLoad(self.mntilistno))
+                button.grid(row=self.row_count, column=5)
+                self.row_count += 1
     def EmptySearchName(self):
         myList = self.frame2.grid_slaves()
         for i in myList:
@@ -63,7 +64,35 @@ class MainGUI:
 
 
     def SearchLocation(self):
-        pass
+        self.EmptySearchName()
+        self.location = self.LocationInput.get()
+        # queryParams = {'serviceKey': ServiceKey, 'searchWrd': self.name, 'numOfRows': 3368}
+        queryParams = {'serviceKey': ServiceKey, 'numOfRows': 3368}
+        response = requests.get(url1, params=queryParams)
+        self.root = ET.fromstring(response.text)
+        for i, col_name in enumerate(header1):
+            label = tkinter.Label(self.frame2, text=col_name, font=("Helvetica", 14, "bold"))
+            label.grid(row=0, column=i)
+
+        self.row_count = 1
+        for item in self.root.iter("item"):
+            if item.findtext("mntiadd").split()[1] == self.location:
+                self.mntiname = item.findtext("mntiname")
+                self.mntiadd = item.findtext("mntiadd")
+                self.mntihigh = item.findtext("mntihigh")
+                self.mntiadmin = item.findtext("mntiadmin")
+                self.mntiadminnum = item.findtext("mntiadminnum")
+                # self.mntidetails = item.findtext("mntidetails")
+                self.mntilistno = item.findtext("mntilistno")
+                self.data = [self.mntiname, self.mntiadd, self.mntihigh, self.mntiadmin, self.mntiadminnum]
+                # self.data = [self.mntiname, self.mntiadd, self.mntihigh, self.mntiadmin, self.mntiadminnum, self.mntidetails]
+                for i, value in enumerate(self.data):
+                    label = tkinter.Label(self.frame2, text=value, font=("Helvetica", 12))
+                    label.grid(row=self.row_count, column=i)
+                button = tkinter.Button(self.frame2, text='숲길 정보', font=("Helvetica", 12),
+                                        command=self.SearchMountainLoad(self.mntilistno))
+                button.grid(row=self.row_count, column=5)
+                self.row_count += 1
 
     def LikeList(self):
         pass
