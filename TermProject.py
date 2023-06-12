@@ -1,5 +1,7 @@
 from tkinter import *
 from tkinter import font
+from tkintermapview import TkinterMapView
+import tkinter.messagebox
 import tkinter.ttk
 import xml.etree.ElementTree as ET
 import requests
@@ -48,7 +50,7 @@ class MainGUI:
 
         mnti = self.MntList[self.LbIndex]
 
-
+        # 설명 텍스트 변경
         self.RenderText.insert(INSERT, '이름: ')
         self.RenderText.insert(INSERT, mnti[0])
         self.RenderText.insert(INSERT, '\n')
@@ -73,6 +75,9 @@ class MainGUI:
 
         self.RenderText.configure(state='disabled')
 
+        # 맵 위치 변경
+        address = mnti[0]
+        self.map_widget.set_address(address, marker=True)
 
     def SearchMountainLoad(self, listno):
         queryParams2 = {'serviceKey': ServiceKey, 'mntiListNo': listno}
@@ -121,6 +126,13 @@ class MainGUI:
     def LikeList(self):
         pass
 
+    def ShowMap(self):
+        self.map_widget = TkinterMapView(width=400, height=550, corner_radius=0)
+        self.map_widget.pack()
+        self.map_widget.place(x=780, y=25)
+        self.map_widget.set_address("Seoul")
+        # self.search_marker = self.map_widget.set_address("Seoul", marker=True)
+
     def InitSearchListBox(self):
         ListBoxScrollbar = Scrollbar(self.window)
         ListBoxScrollbar.pack()
@@ -155,15 +167,10 @@ class MainGUI:
         # window 생성 및 타이틀 설정
         self.window = Tk()
         self.window.title('등산 알리미')
-        self.window.geometry('1200x600')
+        self.window.geometry('1250x600')
 
         self.MntList = []
 
-        self.frame2 = tkinter.Frame(self.window)
-        self.frame2.pack()
-        self.frame2.place(x=200, y=0)
-        self.frame3 = tkinter.Frame(self.window)
-        self.frame3.pack()
         #notebook = tkinter.ttk.Notebook(window, width=800, height=600)
         #notebook.pack()
         # Main Screen
@@ -208,6 +215,7 @@ class MainGUI:
         self.SearchListboxBtn.place(x=700, y=100)
         self.InitSearchListBox()
         self.InitRenderText()
+        self.ShowMap()
 
         self.window.mainloop()
 
