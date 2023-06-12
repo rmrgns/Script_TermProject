@@ -1,42 +1,61 @@
+# The code for changing pages was derived from: http://stackoverflow.com/questions/7546050/switch-between-two-frames-in-tkinter
+# License: http://creativecommons.org/licenses/by-sa/3.0/
 
-import requests
-import xml.etree.ElementTree as ET
-import tkinter
-#병원정보 서비스 예제
-url = 'https://apis.data.go.kr/1400000/service/cultureInfoService2/mntInfoOpenAPI2'
-# 공공데이터포털에서 발급받은 디코딩되지 않은 인증키 입력
-service_key = 'dZcoKqxJ0w46SNHY9aMe4zgyOynLtTE0cL4fm9OOQ7oboRaunGQ09BLwKlqx1nwpH8hDfNRVFDrOOsH2Tv5jEg=='
-queryParams = {'serviceKey': service_key, 'pageNo': '1', 'numOfRows': '10'}
+import random
+import tkinter as tk
+root = tk.Tk()
+root.title("Tkinter Bar and Pie Graph")
 
-response = requests.get(url, params=queryParams)
-print(response.text)
-root = ET.fromstring(response.text)
+###############################################################################################
+#바 차트
 
-window = tkinter.Tk()
-window.title("병원정보")
+tk.Label(root, text='Bar Chart').pack()
+data = [21, 20, 19, 16, 14, 13, 11, 9, 4, 3]
+c_width = 400
+c_height = 350
+c = tk.Canvas(root, width=c_width, height=c_height, bg= 'white')
+c.pack()
 
-frame = tkinter.Frame(window)
-frame.pack()
+#experiment with the variables below size to fit your needs
 
-header = ['Mntiname', 'Mntiadd', 'Mntihigh', 'Mntiadmin', 'Mntiadminnum']
+y_stretch = 15
+y_gap = 20
+x_stretch = 10
+x_width = 20
+x_gap = 20
+for x, y in enumerate(data):
+    # calculate reactangle coordinates
+    x0 = x * x_stretch + x * x_width + x_gap
+    y0 = c_height - (y * y_stretch + y_gap)
+    x1 = x * x_stretch + x * x_width + x_width + x_gap
+    y1 = c_height - y_gap
+    # Here we draw the bar
+    c.create_rectangle(x0, y0, x1, y1, fill="red")
+    c.create_text(x0+2, y0, anchor=tk.SW, text=str(y))
 
-for i, col_name in enumerate(header):
-    label = tkinter.Label(frame, text=col_name, font=("Helvetica", 14, "bold"))
-    label.grid(row=0, column=i)
+###############################################################################################
+#파이차트
 
-row_count = 1
-for item in root.iter("item"):
-    mntiname = item.findtext("mntiname")
-    mntiadd = item.findtext("mntiadd")
-    mntihigh = item.findtext("mntihigh")
-    mntiadmin = item.findtext("mntiadmin")
-    mntiadminnum = item.findtext("mntiadminnum")
+def random_color():
+    color = '#'
+    colors = ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F']
+    for i in range(6):
+        color += colors[random.randint(0,15)]
+    return color
 
-    data = [mntiname, mntiadd, mntihigh, mntiadmin, mntiadminnum]
-    for i, value in enumerate(data):
-        label = tkinter.Label(frame, text=value, font=("Helvetica", 12))
-        label.grid(row=row_count, column=i)
+tk.Label(root, text='Pie Chart').pack()
+c2 = tk.Canvas(width=c_width, height=c_height, bg='white')
+c2.pack()
+data2 = [100, 150, 200, 300, 50]
+start = 0
+s = sum(data2)
 
-    row_count += 1
+for i in range(5):
+    extent = data2[i]/s * 360
+    color = random_color()
+    c2.create_arc((0,0,300,300),fill=color,outline='white',start=start,extent=extent)
+    start = start+extent
+    c2.create_rectangle(300,20+20*i,300+30,20+20*(i+1),fill=color)
+    c2.create_text(300+50,10+20*(i+1),text=str(data2[i]))
 
-window.mainloop()
+root.mainloop()

@@ -9,7 +9,7 @@ import spam
 
 ServiceKey = 'dZcoKqxJ0w46SNHY9aMe4zgyOynLtTE0cL4fm9OOQ7oboRaunGQ09BLwKlqx1nwpH8hDfNRVFDrOOsH2Tv5jEg=='
 url1 = 'https://apis.data.go.kr/1400000/service/cultureInfoService2/mntInfoOpenAPI2'
-url2 = 'https://apis.data.go.kr/1400377/forestPoint/forestPointListEmdSearch'
+url2 = 'https://apis.data.go.kr/1400377/forestPoint/forestPointListSidoSearch'
 # url3 = 'https://apis.data.go.kr/1400000/forestStusService/getfirestatsservice'
 
 header1 = ['이름', '주소', '높이', '소재지', '소재지 전화번호', '상세정보']
@@ -20,14 +20,12 @@ class MainGUI:
         self.SearchListBox.delete(0, END)
         self.MntList = []
         self.name = self.SearchInput.get()
-        queryParams = {'serviceKey': ServiceKey, 'searchWrd': self.name, 'numOfRows': 3368}
-        #queryParams = {'serviceKey': ServiceKey, 'numOfRows': 3368}
+        queryParams = {'serviceKey': ServiceKey, 'searchWrd': self.name}
         response = requests.get(url1, params=queryParams)
         self.root = ET.fromstring(response.text)
 
         self.row_count = 0
         for item in self.root.iter("item"):
-            #if item.findtext("mntiname") == self.name:
             self.mntiname = item.findtext("mntiname")
             self.mntiadd = item.findtext("mntiadd")
             self.mntihigh = item.findtext("mntihigh")
@@ -40,10 +38,7 @@ class MainGUI:
             self.row_count += 1
 
         # spam모듈을 활용한 검색 결과 개수 출력
-        count = 0
-        #count = self.row_count
-        count = spam.numOfResult(self.MntList)
-        self.numOfResult.configure(text=count)
+        self.UseModule()
 
     def SearchMnt(self):
         self.RenderText.configure(state='normal')
@@ -78,7 +73,9 @@ class MainGUI:
         self.RenderText.configure(state='disabled')
 
         # 맵 위치 변경
-        address = mnti[0]
+        mntiaddress = mnti[1].split()[0] + ' ' + mnti[1].split()[1]
+        address = mntiaddress + ' ' + mnti[0]
+        print(address)
         self.map_widget.set_address(address, marker=True)
 
     def SearchMountainLoad(self, listno):
@@ -97,15 +94,11 @@ class MainGUI:
 
     def SearchLocation(self):
         self.location = self.LocationInput.get()
-        # queryParams = {'serviceKey': ServiceKey, 'searchWrd': self.name, 'numOfRows': 3368}
         queryParams = {'serviceKey': ServiceKey, 'numOfRows': 3368}
         response = requests.get(url1, params=queryParams)
         self.root = ET.fromstring(response.text)
-        for i, col_name in enumerate(header1):
-            label = tkinter.Label(self.frame2, text=col_name, font=("Helvetica", 14, "bold"))
-            label.grid(row=0, column=i)
 
-        self.row_count = 1
+        self.row_count = 0
         for item in self.root.iter("item"):
             if item.findtext("mntiadd").split()[1] == self.location:
                 self.mntiname = item.findtext("mntiname")
@@ -113,20 +106,100 @@ class MainGUI:
                 self.mntihigh = item.findtext("mntihigh")
                 self.mntiadmin = item.findtext("mntiadmin")
                 self.mntiadminnum = item.findtext("mntiadminnum")
-                # self.mntidetails = item.findtext("mntidetails")
-                self.mntilistno = item.findtext("mntilistno")
-                self.data = [self.mntiname, self.mntiadd, self.mntihigh, self.mntiadmin, self.mntiadminnum]
-                # self.data = [self.mntiname, self.mntiadd, self.mntihigh, self.mntiadmin, self.mntiadminnum, self.mntidetails]
-                for i, value in enumerate(self.data):
-                    label = tkinter.Label(self.frame2, text=value, font=("Helvetica", 12))
-                    label.grid(row=self.row_count, column=i)
-                button = tkinter.Button(self.frame2, text='숲길 정보', font=("Helvetica", 12),
-                                        command=self.SearchMountainLoad(self.mntilistno))
-                button.grid(row=self.row_count, column=5)
+                self.mntidetails = item.findtext("mntidetails")
+                self.mntitop = item.findtext("mntitop")
+                self.SearchListBox.insert(self.row_count, self.mntiname)
+                self.MntList.append(
+                    [self.mntiname, self.mntiadd, self.mntihigh, self.mntiadmin, self.mntiadminnum, self.mntidetails,
+                     self.mntitop])
                 self.row_count += 1
+
+        self.UseModule()
 
     def LikeList(self):
         pass
+
+    def CheckForestPoint(self):
+        self.locationName = self.ForestPointInput.get()
+        locationNum = 0
+        if self.locationName == "서울특별시":
+            locationNum = 11
+        elif self.locationName == "부산광역시":
+            locationNum = 26
+        elif self.locationName == "대구광역시":
+            locationNum = 27
+        elif self.locationName == "인천광역시":
+            locationNum = 28
+        elif self.locationName == "광주광역시":
+            locationNum = 29
+        elif self.locationName == "대전광역시":
+            locationNum = 30
+        elif self.locationName == "울산광역시":
+            locationNum = 31
+        elif self.locationName == "세종특별자치시":
+            locationNum = 36
+        elif self.locationName == "경기도":
+            locationNum = 41
+        elif self.locationName == "강원도":
+            locationNum = 42
+        elif self.locationName == "충청북도":
+            locationNum = 43
+        elif self.locationName == "충청남도":
+            locationNum = 44
+        elif self.locationName == "전라북도":
+            locationNum = 45
+        elif self.locationName == "전라남도":
+            locationNum = 46
+        elif self.locationName == "경상북도":
+            locationNum = 47
+        elif self.locationName == "경상남도":
+            locationNum = 48
+        elif self.locationName == "제주특별자치도":
+            locationNum = 50
+        else:
+            print("error")
+            return
+
+        self.ForestPointName.configure(text=self.locationName)
+
+        queryParams = {'serviceKey': ServiceKey, 'localAreas': locationNum}
+        response = requests.get(url2, params=queryParams)
+        self.root = ET.fromstring(response.text)
+
+        self.d1 = 0.00001
+        self.d2 = 0.00001
+        self.d3 = 0.00001
+        self.d4 = 0.00001
+
+        for item in self.root.iter("item"):
+            date = item.findtext("analdate")
+            self.d1 += int(item.findtext("d1"))
+            self.d2 += int(item.findtext("d2"))
+            self.d3 += int(item.findtext("d3"))
+            self.d4 += int(item.findtext("d4"))
+            print(date)
+        self.UseGraph()
+
+    def UseGraph(self):
+        c2 = Canvas(self.window, width=400, height=300)
+        c2.pack()
+        c2.place(x=1200,y=100)
+        data = [self.d1, self.d2, self.d3, self.d4]
+        data2 = ['낮음', '다소높음', '높음', '매우높음']
+        start = 0
+        s = sum(data)
+
+        for i in range(4):
+            extent = data[i] / s * 360
+            c2.create_arc((0, 0, 300, 300), fill=self.color[i], outline='white', start=start, extent=extent)
+            start = start + extent
+            c2.create_rectangle(300, 20 + 20 * i, 300 + 30, 20 + 20 * (i + 1), fill=self.color[i])
+            c2.create_text(300 + 70, 10 + 20 * (i + 1), text=str(data2[i]))
+
+    def UseModule(self):
+        count = 0
+        count = spam.numOfResult(self.MntList)
+        self.numOfResult.configure(text=count)
 
     def ShowMap(self):
         self.map_widget = TkinterMapView(width=400, height=550, corner_radius=0)
@@ -137,7 +210,7 @@ class MainGUI:
 
     def InitSearchListBox(self):
         ListBoxScrollbar = Scrollbar(self.window)
-        ListBoxScrollbar.pack()
+        ListBoxScrollbar.pack(side=RIGHT, fill=BOTH)
         ListBoxScrollbar.place(x=625, y=50)
 
         self.SearchListBox = Listbox(self.window, font=("Helvetica", 12), activestyle='none', width=20, height=5, borderwidth=10,
@@ -169,10 +242,14 @@ class MainGUI:
         # window 생성 및 타이틀 설정
         self.window = Tk()
         self.window.title('등산 알리미')
-        self.window.geometry('1250x600')
+        self.window.geometry('1650x600')
 
         self.MntList = []
-
+        self.color = []
+        self.color.append('#88AAAA')
+        self.color.append('#AAAAAA')
+        self.color.append('#CCAAAA')
+        self.color.append('#FFAAAA')
         #notebook = tkinter.ttk.Notebook(window, width=800, height=600)
         #notebook.pack()
         # Main Screen
@@ -180,10 +257,10 @@ class MainGUI:
         self.AppNameFont = font.Font(self.window, size=32, weight='bold')
         self.AppNameLb = Label(self.window, text='등산 알리미', font=self.AppNameFont)
         self.AppNameLb.pack()
-        self.AppNameLb.place(x=125, y=0)
+        self.AppNameLb.place(x=100, y=0)
 
         # 이미지
-        self.MainImage = PhotoImage(file='tempImage.png')
+        self.MainImage = PhotoImage(file='mntscreen.png')
         self.MainImageLb = Label(self.window, image=self.MainImage)
         self.MainImageLb.pack()
         self.MainImageLb.place(x=0, y=50)
@@ -199,7 +276,11 @@ class MainGUI:
         self.LikeListBtn = Button(self.frame, text='즐겨찾기', command=self.LikeList)
         self.SearchInput = Entry(self.frame)
         self.LocationInput = Entry(self.frame)
+        self.ForestPointBtn = Button(self.frame, text='예보 지역', command=self.CheckForestPoint)
+        self.ForestPointInput = Entry(self.frame)
 
+        self.ForestPointInput.grid(row=3, column=1)
+        self.ForestPointBtn.grid(row=3, column=0)
         self.SearchNameBtn.grid(row=0, column=0)
         self.SearchInput.grid(row=0, column=1)
         self.SearchLocationBtn.grid(row=1, column=0)
@@ -224,6 +305,11 @@ class MainGUI:
         self.numOfResult = Label(self.window, text='0', font=("Helvetica", 14, "bold"))
         self.numOfResult.pack(side="right")
         self.numOfResult.place(x=665, y=50)
+        self.ForestPointName = Label(self.window, text='지역 이름', font=("Helvetica", 14, "bold"))
+        self.ForestPointName.pack()
+        self.ForestPointName.place(x=1250,y=50)
+
+
         self.window.mainloop()
 
 
