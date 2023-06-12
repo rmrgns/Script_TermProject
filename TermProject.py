@@ -5,6 +5,7 @@ import tkinter.messagebox
 import tkinter.ttk
 import xml.etree.ElementTree as ET
 import requests
+import spam
 
 ServiceKey = 'dZcoKqxJ0w46SNHY9aMe4zgyOynLtTE0cL4fm9OOQ7oboRaunGQ09BLwKlqx1nwpH8hDfNRVFDrOOsH2Tv5jEg=='
 url1 = 'https://apis.data.go.kr/1400000/service/cultureInfoService2/mntInfoOpenAPI2'
@@ -24,8 +25,7 @@ class MainGUI:
         response = requests.get(url1, params=queryParams)
         self.root = ET.fromstring(response.text)
 
-
-        self.row_count = 1
+        self.row_count = 0
         for item in self.root.iter("item"):
             #if item.findtext("mntiname") == self.name:
             self.mntiname = item.findtext("mntiname")
@@ -39,6 +39,11 @@ class MainGUI:
             self.MntList.append([self.mntiname, self.mntiadd, self.mntihigh, self.mntiadmin, self.mntiadminnum, self.mntidetails, self.mntitop])
             self.row_count += 1
 
+        # spam모듈을 활용한 검색 결과 개수 출력
+        count = 0
+        #count = self.row_count
+        count = spam.numOfResult(self.MntList)
+        self.numOfResult.configure(text=count)
 
     def SearchMnt(self):
         self.RenderText.configure(state='normal')
@@ -209,11 +214,16 @@ class MainGUI:
         self.label.place(x=500, y=10)
         self.SearchListboxBtn = Button(self.window, font=60, text='검색', command=self.SearchMnt)
         self.SearchListboxBtn.pack()
-        self.SearchListboxBtn.place(x=700, y=100)
+        self.SearchListboxBtn.place(x=675, y=130)
         self.InitSearchListBox()
         self.InitRenderText()
         self.ShowMap()
-
+        self.numOfResultLb = Label(self.window, text='검색 결과', font=("Helvetica", 14, "bold"))
+        self.numOfResultLb.pack()
+        self.numOfResultLb.place(x=665, y=10)
+        self.numOfResult = Label(self.window, text='0', font=("Helvetica", 14, "bold"))
+        self.numOfResult.pack(side="right")
+        self.numOfResult.place(x=665, y=50)
         self.window.mainloop()
 
 
