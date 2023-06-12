@@ -11,9 +11,6 @@ url1 = 'https://apis.data.go.kr/1400000/service/cultureInfoService2/mntInfoOpenA
 url2 = 'https://apis.data.go.kr/1400377/forestPoint/forestPointListEmdSearch'
 # url3 = 'https://apis.data.go.kr/1400000/forestStusService/getfirestatsservice'
 
-
-
-
 header1 = ['이름', '주소', '높이', '소재지', '소재지 전화번호', '상세정보']
 
 
@@ -65,10 +62,10 @@ class MainGUI:
         self.RenderText.insert(INSERT, '\n')
         self.RenderText.insert(INSERT, '소재지 전화번호')
         self.RenderText.insert(INSERT, mnti[4])
-        self.RenderText.insert(INSERT, '\n')
+        self.RenderText.insert(INSERT, '\n\n')
         self.RenderText.insert(INSERT, '상세정보: ')
         self.RenderText.insert(INSERT, mnti[5])
-        self.RenderText.insert(INSERT, '\n')
+        self.RenderText.insert(INSERT, '\n\n')
         self.RenderText.insert(INSERT, '봉우리 정보: ')
         self.RenderText.insert(INSERT, mnti[6])
         self.RenderText.insert(INSERT, '\n')
