@@ -14,25 +14,31 @@ from datetime import date, datetime, timedelta
 import traceback
 
 key = 'dZcoKqxJ0w46SNHY9aMe4zgyOynLtTE0cL4fm9OOQ7oboRaunGQ09BLwKlqx1nwpH8hDfNRVFDrOOsH2Tv5jEg%3D%3D'
-TOKEN = '6173459296:AAHHpKbnpemIXhsDw9XVLfMz8psPjuq_HL0'
+TOKEN = '5704908620:AAEiGCJtaE5bK_n0JezC8uwxQV8cSxLCxlw'
 MAX_MSG_LENGTH = 3000
 baseurl = 'https://apis.data.go.kr/1400000/service/cultureInfoService2/mntInfoOpenAPI2?serviceKey='+key
 bot = telepot.Bot(TOKEN)
 
 def getData(param):
     res_list = []
-    url = baseurl+'&searchWrd='+quote(param)
+
+    url = baseurl + '&searchWrd=' + quote(param)
     #print(url)
-    #url = url.encode('utf-8')
     res_body = urlopen(url).read()
     #print(res_body)
     soup = BeautifulSoup(res_body, 'xml')
     items = soup.findAll('item')
     for item in items:
-        item = re.sub('<.*?>', '|', item.text)
-        parsed = item.split('|')
+        parsed = {}
+        parsed['mntiname'] = item.find('mntiname').text if item.find('mntiname') else ''
+        parsed['mntiadd'] = item.find('mntiadd').text if item.find('mntiadd') else ''
+        parsed['mntihigh'] = item.find('mntihigh').text if item.find('mntihigh') else ''
+        parsed['mntiadmin'] = item.find('mntiadmin').text if item.find('mntiadmin') else ''
+        parsed['mntiadminnum'] = item.find('mntiadminnum').text if item.find('mntiadminnum') else ''
+        parsed['mntidetails'] = item.find('mntidetails').text if item.find('mntidetails') else ''
+        parsed['mntitop'] = item.find('mntitop').text if item.find('mntitop') else ''
         try:
-            row = parsed[7]+'\n'+parsed[1]+'\n'+parsed[5]+'\n'+parsed[2]+'\n'+parsed[3]+'\n'+parsed[4] + '\n' + parsed[11]
+            row = f"{parsed['mntiname']}\n{parsed['mntiadd']}\n{parsed['mntihigh']}\n{parsed['mntiadmin']}\n{parsed['mntiadminnum']}\n{parsed['mntidetails']}\n{parsed['mntitop']}\n-\n"
         except IndexError:
             row = item.replace('|', ',')
 
@@ -42,8 +48,8 @@ def getData(param):
 
 def sendMessage(user, msg):
     try:
-        bot.sendMessage(user, msg, parse_mode='HTML')
-    except Exception as e:
+        bot.sendMessage(user, msg)
+    except:
         traceback.print_exc(file=sys.stdout)
 
 def run(date_param, param='11710'):
