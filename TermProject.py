@@ -162,7 +162,7 @@ class MainGUI:
 
         self.ForestPointName.configure(text=self.locationName)
 
-        queryParams = {'serviceKey': ServiceKey, 'localAreas': locationNum}
+        queryParams = {'serviceKey': ServiceKey,'numOfRows': 10, 'pageNo': 1, 'localAreas': locationNum}
         response = requests.get(url2, params=queryParams)
         self.root = ET.fromstring(response.text)
 
@@ -177,7 +177,8 @@ class MainGUI:
             self.d2 += int(item.findtext("d2"))
             self.d3 += int(item.findtext("d3"))
             self.d4 += int(item.findtext("d4"))
-            print(date)
+            #print(date)
+
         self.UseGraph()
 
     def UseGraph(self):
