@@ -97,10 +97,19 @@ class MainGUI:
         pass
 
     def InitSearchListBox(self):
-        ListBoxScrollbar = Scrollbar(self.frame2)
+        ListBoxScrollbar = Scrollbar(self.window)
         ListBoxScrollbar.pack()
-        ListBoxScrollbar.place(x=400, y=0)
+        ListBoxScrollbar.place(x=625, y=50)
 
+        self.SearchListBox = Listbox(self.window, font=("Helvetica", 12), activestyle='none', width=20, height=5, borderwidth=10,
+                                relief='ridge', yscrollcommand=ListBoxScrollbar.set)
+
+        #self.SearchListBox.insert(1,'empty')
+
+        self.SearchListBox.pack()
+        self.SearchListBox.place(x=420, y=50)
+
+        ListBoxScrollbar.config(command=self.SearchListBox.yview)
 
     def __init__(self):
         self.name = ""
@@ -111,6 +120,7 @@ class MainGUI:
         self.window.geometry('800x600')
         self.frame2 = tkinter.Frame(self.window)
         self.frame2.pack()
+        self.frame2.place(x=200, y=0)
         self.frame3 = tkinter.Frame(self.window)
         self.frame3.pack()
         #notebook = tkinter.ttk.Notebook(window, width=800, height=600)
@@ -150,9 +160,11 @@ class MainGUI:
         #for i, col_name in enumerate(header1):
         #    label = tkinter.Label(self.frame2, text=col_name, font=("Helvetica", 14, "bold"))
         #    label.grid(row=0, column=i)
-        label = tkinter.Label(self.window, text='이름', font=("Helvetica", 14, "bold"))
-        label.pack()
-        label.place(x=500, y=10)
+        self.label = tkinter.Label(self.window, text='이름', font=("Helvetica", 14, "bold"))
+        self.label.pack()
+        self.label.place(x=500, y=10)
+
+        self.InitSearchListBox()
 
         self.window.mainloop()
 
