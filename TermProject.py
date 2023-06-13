@@ -252,6 +252,9 @@ class MainGUI:
             #print('empty list')
             return
         mnti = self.MntList[self.LbIndex]
+        for i in self.likelist:
+            if mnti == i:
+                return
         self.likelist.append([mnti[0], mnti[1], mnti[2], mnti[3], mnti[4], mnti[5], mnti[6]])
         print(self.likelist)
 
