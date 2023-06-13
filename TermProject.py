@@ -77,9 +77,9 @@ class MainGUI:
         mntiaddress = mnti[1].split()[0] + ' ' + mnti[1].split()[1]
         address = mntiaddress + ' ' + mnti[0]
         self.map_widget.set_address(mnti[1], marker=True)
-        self.map_widget.set_address(address, marker=True)
         self.map_widget.set_address(mnti[0], marker=True)
-
+        self.map_widget.set_address(address, marker=True)
+        
     def SearchMountainLoad(self, listno):
         queryParams2 = {'serviceKey': ServiceKey, 'mntiListNo': listno}
         response2 = requests.get(url1, params=queryParams2)
