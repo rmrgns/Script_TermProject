@@ -79,7 +79,7 @@ class MainGUI:
         self.map_widget.set_address(mnti[1], marker=True)
         self.map_widget.set_address(mnti[0], marker=True)
         self.map_widget.set_address(address, marker=True)
-        
+
     def SearchMountainLoad(self, listno):
         queryParams2 = {'serviceKey': ServiceKey, 'mntiListNo': listno}
         response2 = requests.get(url1, params=queryParams2)
@@ -96,6 +96,8 @@ class MainGUI:
 
     def SearchLocation(self):
         self.searchType = 0
+        self.SearchListBox.delete(0, END)
+        self.MntList = []
         self.location = self.LocationInput.get()
         queryParams = {'serviceKey': ServiceKey, 'numOfRows': 3368}
         response = requests.get(url1, params=queryParams)
@@ -256,7 +258,7 @@ class MainGUI:
             if mnti == i:
                 return
         self.likelist.append([mnti[0], mnti[1], mnti[2], mnti[3], mnti[4], mnti[5], mnti[6]])
-        print(self.likelist)
+        #print(self.likelist)
 
     def DeleteLikeList(self):
         if self.searchType == 0:
