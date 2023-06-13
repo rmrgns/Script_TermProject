@@ -12,11 +12,9 @@ url1 = 'https://apis.data.go.kr/1400000/service/cultureInfoService2/mntInfoOpenA
 url2 = 'https://apis.data.go.kr/1400377/forestPoint/forestPointListSidoSearch'
 # url3 = 'https://apis.data.go.kr/1400000/forestStusService/getfirestatsservice'
 
-header1 = ['이름', '주소', '높이', '소재지', '소재지 전화번호', '상세정보']
-
-
 class MainGUI:
     def SearchName(self):
+        self.searchType = 0
         self.SearchListBox.delete(0, END)
         self.MntList = []
         self.name = self.SearchInput.get()
@@ -45,7 +43,10 @@ class MainGUI:
         self.RenderText.delete(0.0, END)
         self.LbIndex = self.SearchListBox.curselection()[0]
 
-        mnti = self.MntList[self.LbIndex]
+        if self.searchType == 0:
+            mnti = self.MntList[self.LbIndex]
+        elif self.searchType == 1:
+            mnti = self.likelist[self.LbIndex]
 
         # 설명 텍스트 변경
         self.RenderText.insert(INSERT, '이름: ')
@@ -75,8 +76,9 @@ class MainGUI:
         # 맵 위치 변경
         mntiaddress = mnti[1].split()[0] + ' ' + mnti[1].split()[1]
         address = mntiaddress + ' ' + mnti[0]
-        print(address)
+        self.map_widget.set_address(mnti[1], marker=True)
         self.map_widget.set_address(address, marker=True)
+        self.map_widget.set_address(mnti[0], marker=True)
 
     def SearchMountainLoad(self, listno):
         queryParams2 = {'serviceKey': ServiceKey, 'mntiListNo': listno}
@@ -93,6 +95,7 @@ class MainGUI:
 
 
     def SearchLocation(self):
+        self.searchType = 0
         self.location = self.LocationInput.get()
         queryParams = {'serviceKey': ServiceKey, 'numOfRows': 3368}
         response = requests.get(url1, params=queryParams)
@@ -115,9 +118,6 @@ class MainGUI:
                 self.row_count += 1
 
         self.UseModule()
-
-    def LikeList(self):
-        pass
 
     def CheckForestPoint(self):
         self.locationName = self.ForestPointInput.get()
@@ -237,6 +237,35 @@ class MainGUI:
 
         self.RenderText.configure(state='disabled')
 
+    def LikeList(self):
+        self.searchType = 1
+        self.SearchListBox.delete(0, END)
+        for i in range(len(self.likelist)):
+            self.SearchListBox.insert(i, self.likelist[i][0])
+
+
+    def AddLikeList(self):
+        if self.searchType == 1:
+            return
+        self.LbIndex = self.SearchListBox.curselection()[0]
+        if self.MntList[self.LbIndex][0] == '':
+            #print('empty list')
+            return
+        mnti = self.MntList[self.LbIndex]
+        self.likelist.append([mnti[0], mnti[1], mnti[2], mnti[3], mnti[4], mnti[5], mnti[6]])
+        print(self.likelist)
+
+    def DeleteLikeList(self):
+        if self.searchType == 0:
+            return
+        self.LbIndex = self.SearchListBox.curselection()[0]
+        if self.likelist[self.LbIndex][0] == '':
+            return
+        self.likelist.pop(self.LbIndex)
+        self.LikeList()
+
+
+
     def __init__(self):
         self.name = ""
         self.SearchLabel = []
@@ -251,6 +280,9 @@ class MainGUI:
         self.color.append('#AAAAAA')
         self.color.append('#CCAAAA')
         self.color.append('#FFAAAA')
+        self.searchType = 0
+        self.likelist = []
+
         #notebook = tkinter.ttk.Notebook(window, width=800, height=600)
         #notebook.pack()
         # Main Screen
@@ -296,7 +328,7 @@ class MainGUI:
         self.label.place(x=500, y=10)
         self.SearchListboxBtn = Button(self.window, font=60, text='검색', command=self.SearchMnt)
         self.SearchListboxBtn.pack()
-        self.SearchListboxBtn.place(x=675, y=130)
+        self.SearchListboxBtn.place(x=675, y=80)
         self.InitSearchListBox()
         self.InitRenderText()
         self.ShowMap()
@@ -305,11 +337,16 @@ class MainGUI:
         self.numOfResultLb.place(x=665, y=10)
         self.numOfResult = Label(self.window, text='0', font=("Helvetica", 14, "bold"))
         self.numOfResult.pack(side="right")
-        self.numOfResult.place(x=665, y=50)
+        self.numOfResult.place(x=690, y=35)
         self.ForestPointName = Label(self.window, text='지역 이름', font=("Helvetica", 14, "bold"))
         self.ForestPointName.pack()
         self.ForestPointName.place(x=1250,y=50)
-
+        self.AddLikeListBtn = Button(self.window, font=30, text='즐겨찾기 추가', command=self.AddLikeList)
+        self.AddLikeListBtn.pack()
+        self.AddLikeListBtn.place(x=640, y=115)
+        self.DelLikeListBtn = Button(self.window, font=30, text='즐겨찾기 삭제', command=self.DeleteLikeList)
+        self.DelLikeListBtn.pack()
+        self.DelLikeListBtn.place(x=640, y=145)
 
         self.window.mainloop()
 
