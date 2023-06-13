@@ -14,7 +14,7 @@ from datetime import date, datetime, timedelta
 import traceback
 
 key = 'dZcoKqxJ0w46SNHY9aMe4zgyOynLtTE0cL4fm9OOQ7oboRaunGQ09BLwKlqx1nwpH8hDfNRVFDrOOsH2Tv5jEg%3D%3D'
-TOKEN = '5704908620:AAEiGCJtaE5bK_n0JezC8uwxQV8cSxLCxlw'
+TOKEN = '토큰 입력'
 MAX_MSG_LENGTH = 3000
 baseurl = 'https://apis.data.go.kr/1400000/service/cultureInfoService2/mntInfoOpenAPI2?serviceKey='+key
 bot = telepot.Bot(TOKEN)
